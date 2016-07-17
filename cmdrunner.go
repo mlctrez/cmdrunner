@@ -15,9 +15,7 @@ const (
 	CmdStderr
 )
 
-type OutputSink interface {
-	HandleOutput(out *CmdOutput)
-}
+type OutputSink func(out *CmdOutput)
 
 type CmdOutput struct {
 	Channel CmdChannel ``
@@ -61,7 +59,7 @@ func (r *CmdRunner) Start(outputSink OutputSink) error {
 
 	go func() {
 		for cmdOut := range r.output {
-			r.sink.HandleOutput(cmdOut)
+			r.sink(cmdOut)
 		}
 	}()
 
