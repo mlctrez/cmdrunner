@@ -20,7 +20,7 @@ type OutputSink interface {
 }
 
 type CmdOutput struct {
-	Channel CmdChannel``
+	Channel CmdChannel ``
 	Text    string
 }
 
@@ -36,19 +36,19 @@ func NewCmdRunner(cmd *exec.Cmd) *CmdRunner {
 	return &CmdRunner{cmd: cmd, output: ch}
 }
 
-func (r *CmdRunner) readPipe(pipeFunc func() (io.ReadCloser, error), ch CmdChannel) error {
+func (r *CmdRunner) readPipe(readerFunc func() (io.ReadCloser, error), ch CmdChannel) error {
 
-	stdoutReader, err := pipeFunc()
+	reader, err := readerFunc()
 	if err != nil {
 		return err
 	}
 
-	stdoutScanner := bufio.NewScanner(stdoutReader)
+	scanner := bufio.NewScanner(reader)
 
 	r.wg.Add(1)
 	go func() {
-		for stdoutScanner.Scan() {
-			r.output <- &CmdOutput{Channel: ch, Text: stdoutScanner.Text()}
+		for scanner.Scan() {
+			r.output <- &CmdOutput{Channel: ch, Text: scanner.Text()}
 		}
 		r.wg.Done()
 	}()
@@ -60,20 +60,15 @@ func (r *CmdRunner) Start(outputSink OutputSink) error {
 	r.sink = outputSink
 
 	go func() {
-		for {
-			cmdOut := <-r.output
-			if cmdOut != nil {
-				r.sink.HandleOutput(cmdOut)
-			}
+		for cmdOut := range r.output {
+			r.sink.HandleOutput(cmdOut)
 		}
 	}()
 
-	err := r.readPipe(r.cmd.StdoutPipe, CmdStdout)
-	if err != nil {
+	if err := r.readPipe(r.cmd.StdoutPipe, CmdStdout); err != nil {
 		return err
 	}
-	err = r.readPipe(r.cmd.StderrPipe, CmdStderr)
-	if err != nil {
+	if err := r.readPipe(r.cmd.StderrPipe, CmdStderr); err != nil {
 		return err
 	}
 
