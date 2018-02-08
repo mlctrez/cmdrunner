@@ -1,4 +1,4 @@
-package cmdrunner
+package iface
 
 // generate an interface for CmdRunner
 
