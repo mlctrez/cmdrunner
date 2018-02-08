@@ -69,14 +69,14 @@ func buildSink(logger *log.Logger) cmdrunner.OutputSink {
 	}
 }
 
-type LogContainer struct {
+type logContainer struct {
 	loggerMain *log.Logger
 	loggerCmd  *log.Logger
 }
 
-func buildLogContainer() *LogContainer {
+func buildLogContainer() *logContainer {
 	logFlags := log.LstdFlags | log.Lmicroseconds
-	lc := &LogContainer{
+	lc := &logContainer{
 		loggerMain: log.New(os.Stdout, "", logFlags),
 		loggerCmd:  log.New(os.Stderr, "", logFlags),
 	}
