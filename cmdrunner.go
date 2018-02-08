@@ -2,12 +2,12 @@ package cmdrunner
 
 import (
 	"bufio"
+	"context"
 	"io"
+	"log"
 	"os/exec"
 	"sync"
 	"syscall"
-	"context"
-	"log"
 )
 
 // CmdChannel represents the constant type of stdout or stderr.
@@ -61,7 +61,8 @@ func (r *CmdRunner) WithCancelSignal(signal syscall.Signal) *CmdRunner {
 	return r
 }
 
-// WithDebug turns on debug messages sent to stderr on the output sink
+// WithDebugLogger enables debugging messages.
+// Logging goes to the provided logger.
 func (r *CmdRunner) WithDebugLogger(logger *log.Logger) *CmdRunner {
 	r.debugLogger = logger
 	return r
@@ -187,9 +188,8 @@ func (r *CmdRunner) WaitExit() int {
 			if waitStatus, ok := (ee.Sys()).(syscall.WaitStatus); ok {
 				r.debug("returning exit status from error")
 				return waitStatus.ExitStatus()
-			} else {
-				r.debug("unhandled system dependent process state")
 			}
+			r.debug("unhandled system dependent process state")
 		} else {
 			r.debug("unhandled error type")
 		}
@@ -202,9 +202,8 @@ func (r *CmdRunner) WaitExit() int {
 		if waitStatus, ok := procState.(syscall.WaitStatus); ok {
 			r.debug("returning exit status from process state")
 			return waitStatus.ExitStatus()
-		} else {
-			r.debug("unhandled system dependent process state")
 		}
+		r.debug("unhandled system dependent process state")
 	} else {
 		r.debug("unable to get process state")
 	}

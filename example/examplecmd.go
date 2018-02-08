@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/mlctrez/cmdrunner"
-	"os/exec"
 	"context"
-	"log"
-	"time"
-	"os"
 	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"time"
+
+	"github.com/mlctrez/cmdrunner"
 )
 
 func exampleOne() {
@@ -77,7 +78,7 @@ func buildLogContainer() *LogContainer {
 	logFlags := log.LstdFlags | log.Lmicroseconds
 	lc := &LogContainer{
 		loggerMain: log.New(os.Stdout, "", logFlags),
-		loggerCmd: log.New(os.Stderr, "", logFlags),
+		loggerCmd:  log.New(os.Stderr, "", logFlags),
 	}
 	return lc
 }
